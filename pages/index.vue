@@ -69,7 +69,8 @@
         </div>
         <div>
             <p class="text-center text-gray-500 italic">Source code available on <a
-                    href="https://github.com/noc2spam/cliparoo" class="text-blue-500 hover:underline">GitHub</a>.</p>
+                    href="https://github.com/noc2spam/cliparoo" class="text-blue-500 hover:underline"
+                    target="_blank">GitHub</a>.</p>
 
         </div>
     </ClientOnly>
