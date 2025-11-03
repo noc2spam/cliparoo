@@ -26,15 +26,15 @@
                             <div>
                                 <button title="Copy this item to clipboard" class="text-gray-600 hover:text-gray-700"
                                     @click="copyToClipboard(pair.description)">
-                                    <IconsCopy class="h-8 w-8" />
+                                    <IconsCopy class="h-6 w-6 md:h-8 md:w-8" />
                                 </button>
                                 <button title="Edit this item" class="text-blue-600 hover:text-blue-700"
                                     @click="title = pair.title; description = pair.description; appState.popupOpen = true">
-                                    <IconsEdit class="h-8 w-8" />
+                                    <IconsEdit class="h-6 w-6 md:h-8 md:w-8" />
                                 </button>
                                 <button title="Delete this item" class="text-red-500 hover:text-red-600"
                                     @click="confirmAction(pair.title as string)">
-                                    <IconsDelete class="h-8 w-8" />
+                                    <IconsDelete class="h-6 w-6 md:h-8 md:w-8" />
                                 </button>
                             </div>
                         </div>
