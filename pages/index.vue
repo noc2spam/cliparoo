@@ -47,7 +47,7 @@
                     <button @click="addClipboardItem"
                         class="bg-green-700 hover:bg-green-600 text-white rounded-lg px-4 py-2 text-lg">Add
                         Item</button>
-                    <button v-if="clipboard.length" @click="confirmAction('all')"
+                    <button v-if="clipboard.length" @click="confirmAction('', true)"
                         class="bg-red-600 hover:bg-red-500 text-white rounded-lg px-4 text-lg py-2">Clear
                         Clipboard</button>
 
@@ -75,7 +75,7 @@ const appState = useState<{
     popupOpen: boolean;
     textCopied: boolean;
     confirmOpen: boolean;
-    confirmResult: { key: string | null, confirmed: boolean | undefined };
+    confirmResult: { key?: string | null, confirmed: boolean | undefined, clearAll?: boolean };
 }>('appState', () => ({
     popupOpen: false,
     textCopied: false,
@@ -100,13 +100,21 @@ function closePopup() {
 }
 function commitAction(confirmed: boolean) {
     appState.value = { ...appState.value, confirmOpen: false };
-    if (appState.value.confirmResult.key && confirmed) {
-        removeItem(appState.value.confirmResult.key);
+    if (!confirmed) {
+        return;
     }
+    if (appState.value.confirmResult.clearAll) {
+        clearClipboard();
+    } else {
+        if (typeof appState.value.confirmResult.key === 'string') {
+            removeItem(appState.value.confirmResult.key as string);
+        }
+    }
+
     appState.value.confirmResult = { key: null, confirmed: false };
 }
-function confirmAction(key: string) {
-    appState.value.confirmResult = { key, confirmed: undefined };
+function confirmAction(key: string, clearAll = false) {
+    appState.value.confirmResult = { key, confirmed: undefined, clearAll };
     appState.value = { ...appState.value, confirmOpen: true };
 }
 function copyToClipboard(value: string) {
@@ -120,8 +128,8 @@ function copyToClipboard(value: string) {
         }, 2000);
     });
 }
-function removeItem(key: string) {
-    if (key === 'all') {
+function removeItem(key: string, clearAll = false) {
+    if (clearAll) {
         clearClipboard();
         return;
     }
