@@ -14,7 +14,6 @@
     </div>
   </div>
 </template>
-
 <script lang="ts" setup>
 const props = defineProps<{ show: boolean, title?: string, message?: string }>();
 const emit = defineEmits<{
