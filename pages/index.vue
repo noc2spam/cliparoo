@@ -50,7 +50,6 @@
                     <button v-if="clipboard.length" @click="confirmAction('', true)"
                         class="bg-red-600 hover:bg-red-500 text-white rounded-lg px-4 text-lg py-2">Clear
                         Clipboard</button>
-
                 </div>
             </div>
         </div>
@@ -71,7 +70,6 @@
             <p class="text-center text-gray-500 italic">Source code available on <a
                     href="https://github.com/noc2spam/cliparoo" class="text-blue-500 hover:underline"
                     target="_blank">GitHub</a>.</p>
-
         </div>
     </ClientOnly>
 </template>
@@ -116,7 +114,6 @@ function commitAction(confirmed: boolean) {
             removeItem(appState.value.confirmResult.key as string);
         }
     }
-
     appState.value.confirmResult = { key: null, confirmed: false };
 }
 function confirmAction(key: string, clearAll = false) {
