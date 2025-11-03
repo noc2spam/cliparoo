@@ -74,7 +74,6 @@
     </ClientOnly>
 </template>
 <script setup lang="ts">
-
 const appState = useState<{
     popupOpen: boolean;
     textCopied: boolean;
