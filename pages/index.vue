@@ -69,4 +69,8 @@ onMounted(() => {
         Object.assign(clipboard.value, JSON.parse(rawClipboard));
     }
 })
+useSeoMeta({
+    title: 'Cliparoo - Store & manage reused text snippets for easy copy-paste',
+    description: 'Cliparoo is your go-to solution for managing and storing text snippets, making copy-pasting a breeze. Data is stored locally for your privacy.'
+});
 </script>
