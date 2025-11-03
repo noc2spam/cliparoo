@@ -53,7 +53,6 @@ function copyToClipboard(value: string) {
 }
 function deleteClipboardItem(key: string) {
     const currentClipboard = clipboard.value.filter((item) => item.title !== key);
-
     Object.assign(clipboard, currentClipboard);
     localStorage.setItem('clipboard', JSON.stringify(currentClipboard));
 }
