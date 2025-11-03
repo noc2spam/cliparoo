@@ -1,7 +1,7 @@
 <template>
     <ClientOnly placeholder="loading....">
         <Confirm :show="appState.confirmOpen" @close="commitAction" />
-        <div class="mx-auto p-4 max-w-[600px] w-full relative min-h-screen">
+        <div class="mx-auto p-4 max-w-[600px] w-full relative min-h-[80vh]">
             <h1 class="text-7xl w-full text-center font-extrabold pt-5 text-sky-600">
                 <span>Clip</span><span class="text-purple-600">-a-</span><span class="text-orange-600">roo</span><span
                     class="text-blue-600">!</span>
@@ -22,7 +22,7 @@
                             <h2 class="text-lg font-medium">{{ pair.title }}</h2>
                             <div v-for="(line, index) in pair.description.split('\n')" :key="index">{{ line }}</div>
                         </div>
-                        <div class="h-full col-span-2 grid place-items-center">
+                        <div class="h-full col-span-2 grid place-items-start pt-3">
                             <div>
                                 <button title="Copy this item to clipboard" class="text-gray-600 hover:text-gray-700"
                                     @click="copyToClipboard(pair.description)">
@@ -66,6 +66,11 @@
                     class="bg-blue-500 disabled:opacity-60 text-white rounded-lg px-4 py-2">Save</button>
                 <button @click="closePopup" class="bg-gray-300 text-gray-800 rounded-lg px-4 py-2">Cancel</button>
             </div>
+        </div>
+        <div>
+            <p class="text-center text-gray-500 italic">Source code available on <a
+                    href="https://github.com/noc2spam/cliparoo" class="text-blue-500 hover:underline">GitHub</a>.</p>
+
         </div>
     </ClientOnly>
 </template>
