@@ -1,6 +1,6 @@
 <template>
-    <div class="mx-auto p-4 max-w-[600px] w-full">
-        <div class="w-full p-4 bg-gray-100 border border-gray-400 rounded-lg">
+    <div class="mx-auto p-4 max-w-[600px] w-full relative min-h-screen">
+        <div class="w-full p-4 bg-gray-100 border border-gray-400 rounded-lg ">
             <h1 class="text-xl font-bold">My Clipboard</h1>
             <ul v-if="clipboard.length">
                 <li v-for="(pair, key) in clipboard" :key="key">
@@ -16,14 +16,23 @@
             <div v-else>
                 <p>Your clipboard is empty.</p>
             </div>
-            <button @click="clearClipboard">Clear Clipboard</button>
-            <button @click="addClipboardItem">Add Clipboard Item</button>
-            <div v-if="appState.popupOpen">
-                <h2>Add Clipboard Item</h2>
-                <input v-model="title" placeholder="Key" />
-                <input v-model="description" placeholder="Value" />
-                <button @click="saveClipboardItem">Save</button>
-                <button @click="closePopup">Cancel</button>
+            <div class="flex items-center justify-between">
+                <button v-if="clipboard" @click="clearClipboard"
+                    class="bg-red-500 text-white rounded-lg px-4 py-2">Clear
+                    Clipboard</button>
+                <button @click="addClipboardItem" class="bg-blue-500 text-white rounded-lg px-4 py-2">Add Item</button>
+            </div>
+            <div v-if="appState.popupOpen"
+                class="absolute bg-white border border-gray-400 rounded-lg p-4 left-1/2 transform -translate-x-1/2 top-1/2 -translate-y-1/2 shadow-lg">
+                <div class="flex flex-col gap-2 w-64 h-64">
+                    <h2>Add Item</h2>
+                    <input v-model="title" placeholder="Title"
+                        class="border border-gray-300 rounded-lg p-2 mb-2 w-full" />
+                    <input v-model="description" placeholder="Value"
+                        class="border border-gray-300 rounded-lg p-2 mb-2 w-full" />
+                    <button @click="saveClipboardItem" class="bg-blue-500 text-white rounded-lg px-4 py-2">Save</button>
+                    <button @click="closePopup" class="bg-gray-300 text-gray-800 rounded-lg px-4 py-2">Cancel</button>
+                </div>
             </div>
         </div>
     </div>
@@ -37,14 +46,16 @@ const clipboard = ref<{ title: string, description: string }[]>([]);
 const title = ref('');
 const description = ref('')
 function addClipboardItem() {
-    Object.assign(appState.value, { popupOpen: true });
+    appState.value = { popupOpen: true };
 }
 function clearClipboard() {
     localStorage.removeItem('clipboard');
-    Object.assign(clipboard, []);
+    clipboard.value = [];
 }
 function closePopup() {
-    Object.assign(appState.value, { popupOpen: false, newKey: '', newValue: '' });
+    appState.value = { popupOpen: false };
+    title.value = '';
+    description.value = '';
 }
 function copyToClipboard(value: string) {
     navigator.clipboard.writeText(value).then(() => {
@@ -53,13 +64,13 @@ function copyToClipboard(value: string) {
 }
 function deleteClipboardItem(key: string) {
     const currentClipboard = clipboard.value.filter((item) => item.title !== key);
-    Object.assign(clipboard, currentClipboard);
+    clipboard.value = currentClipboard;
     localStorage.setItem('clipboard', JSON.stringify(currentClipboard));
 }
 function saveClipboardItem() {
     const currentClipboard = clipboard.value;
     currentClipboard.push({ title: title.value, description: description.value });
-    Object.assign(clipboard.value, currentClipboard);
+    clipboard.value = currentClipboard;
     localStorage.setItem('clipboard', JSON.stringify(currentClipboard));
     closePopup();
 }
