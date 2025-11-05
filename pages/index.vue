@@ -18,14 +18,14 @@
                 </div>
                 <h2 class="text-xl font-medium text-white">My Snippets</h2>
                 <ul v-if="clipboard.length" class="py-4 flex flex-col gap-4">
-                    <li class="flex items-start justify-between border border-gray-400/60 bg-[#fefae0] rounded-lg p-2"
+                    <li class="flex  flex-col md:flex-row items-start justify-between border border-gray-400/60 bg-[#fefae0] rounded-lg p-2"
                         v-for="(pair, key) in clipboard" :key="key">
                         <div class="col-span-6">
                             <h2 class="text-lg font-medium">{{ pair.title }}</h2>
                             <div v-for="(line, index) in pair.description.split('\n')" :key="index">{{ line }}</div>
                         </div>
                         <div class="h-full col-span-2 grid place-items-start pt-3">
-                            <div class="flex gap-2">
+                            <div class="flex  gap-2">
                                 <button title="Copy this item to clipboard"
                                     class="text-white bg-[#77dd5e95] hover:bg-[#77dd5e] rounded-full p-2"
                                     @click="copyToClipboard(pair.description)">
@@ -48,12 +48,12 @@
                 <div v-else class="py-2">
                     You currently have no snippets saved.
                 </div>
-                <div class="flex items-center justify-between">
+                <div class="flex  flex-col md:flex-row gap-2 items-center justify-between">
                     <button @click="addClipboardItem"
-                        class="bg-[#386c39] hover:bg-[#606c38] text-white rounded-lg px-4 py-2 text-lg">Add
+                        class="bg-[#386c39] hover:bg-[#606c38] text-white rounded-lg px-4 py-2 md:w-auto w-full text-lg">Add
                         Item</button>
                     <button v-if="clipboard.length" @click="confirmAction('', true)"
-                        class="bg-[#bd3f3c] hover:bg-[#bd693c] text-white rounded-lg px-4 text-lg py-2">Clear
+                        class="bg-[#bd3f3c] hover:bg-[#bd693c] text-white rounded-lg px-4 text-lg py-2  md:w-auto w-full">Clear
                         Clipboard</button>
                 </div>
             </div>
