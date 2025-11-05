@@ -11,7 +11,7 @@
                 web.</p>
             <div class="w-full p-4 bg-gray-100 border border-gray-400 rounded-lg overflow-hidden relative">
                 <div v-if="appState.textCopied"
-                    class="absolute z-20 bg-green-600/95 py-2 px-2 text-white top-0 w-full left-0">Text copied to
+                    class="fixed z-20 bg-green-600/95 py-2 px-2 text-white top-0 w-full left-0">Text copied to
                     clipboard!
                 </div>
                 <h2 class="text-xl font-bold">My Snippets</h2>
@@ -55,7 +55,7 @@
         </div>
         <div v-if="appState.popupOpen" class="bg-gray-700/30 w-full h-full fixed inset-0" @click="closePopup"></div>
         <div v-if="appState.popupOpen"
-            class="absolute bg-white border border-gray-400 max-w-[800px] w-[90vw] rounded-lg p-4 left-1/2 transform -translate-x-1/2 top-1/2 -translate-y-1/2 shadow-lg ">
+            class="fixed bg-white border border-gray-400 max-w-[800px] w-[90vw] rounded-lg p-4 left-1/2 transform -translate-x-1/2 top-1/2 -translate-y-1/2 shadow-lg ">
             <div class="flex flex-col gap-2 w-full h-full">
                 <h2 class="font-medium text-lg mb-4">{{ title.length ? 'Edit Item' : 'Add Item' }}</h2>
                 <input v-model="title" placeholder="Title" class="border border-gray-300 rounded-lg p-2 mb-2 w-full" />
