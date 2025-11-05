@@ -1,38 +1,43 @@
 <template>
     <ClientOnly placeholder="loading....">
         <Confirm :show="appState.confirmOpen" @close="commitAction" />
-        <div class="mx-auto p-4 max-w-[600px] w-full relative min-h-[80vh]">
-            <h1 class="text-7xl w-full text-center font-extrabold pt-5 text-sky-600">
-                <span>Clip</span><span class="text-purple-600">-a-</span><span class="text-orange-600">roo</span><span
-                    class="text-blue-600">!</span>
+        <div class="mx-auto p-4 max-w-[800px] w-full relative min-h-[80vh]">
+            <h1 class="text-7xl w-full text-center font-extrabold pt-5 text-">
+                <span class="text-[#3c40bd]">Clip</span><span class="text-[#bd3f3c]">-a-</span><span
+                    class="text-[#bd943c]">roo</span><span class="text-[#3cbd56]">!</span>
             </h1>
-            <p class="text-center text-gray-500 pb-5 italic pt-4">localStorage based text snippet manager for
+            <p class="text-center text-gray-700 pb-5 italic pt-4">localStorage based text snippet manager for
                 the
                 web.</p>
-            <div class="w-full p-4 bg-gray-100 border border-gray-400 rounded-lg overflow-hidden relative">
+            <div class="w-full p-4 bg-[#dda15e] shadow-xl rounded-lg overflow-hidden relative">
                 <div v-if="appState.textCopied"
-                    class="fixed z-20 bg-green-600/95 py-2 px-2 text-white top-0 w-full left-0">Text copied to
+                    class="fixed z-20 bg-[#5edd6b] py-2 px-2 text-white top-0 text-center font-medium w-full left-0">
+                    Text copied
+                    to
                     clipboard!
                 </div>
-                <h2 class="text-xl font-bold">My Snippets</h2>
+                <h2 class="text-xl font-medium text-white">My Snippets</h2>
                 <ul v-if="clipboard.length" class="py-4 flex flex-col gap-4">
-                    <li class="flex items-start justify-between border border-gray-400/60 bg-gray-200 rounded-lg p-2"
+                    <li class="flex items-start justify-between border border-gray-400/60 bg-[#fefae0] rounded-lg p-2"
                         v-for="(pair, key) in clipboard" :key="key">
                         <div class="col-span-6">
                             <h2 class="text-lg font-medium">{{ pair.title }}</h2>
                             <div v-for="(line, index) in pair.description.split('\n')" :key="index">{{ line }}</div>
                         </div>
                         <div class="h-full col-span-2 grid place-items-start pt-3">
-                            <div>
-                                <button title="Copy this item to clipboard" class="text-gray-600 hover:text-gray-700"
+                            <div class="flex gap-2">
+                                <button title="Copy this item to clipboard"
+                                    class="text-white bg-[#77dd5e95] hover:bg-[#77dd5e] rounded-full p-2"
                                     @click="copyToClipboard(pair.description)">
                                     <IconsCopy class="h-6 w-6 md:h-8 md:w-8" />
                                 </button>
-                                <button title="Edit this item" class="text-blue-600 hover:text-blue-700"
+                                <button title="Edit this item"
+                                    class="bg-[#5eb5dd95] hover:bg-[#5eb5dd] text-white p-2 rounded-full "
                                     @click="title = pair.title; description = pair.description; appState.popupOpen = true">
                                     <IconsEdit class="h-6 w-6 md:h-8 md:w-8" />
                                 </button>
-                                <button title="Delete this item" class="text-red-500 hover:text-red-600"
+                                <button title="Delete this item"
+                                    class="bg-[#dd5e5e95] hover:bg-[#dd5e5e] text-white p-2 rounded-full "
                                     @click="confirmAction(pair.title as string)">
                                     <IconsDelete class="h-6 w-6 md:h-8 md:w-8" />
                                 </button>
@@ -45,10 +50,10 @@
                 </div>
                 <div class="flex items-center justify-between">
                     <button @click="addClipboardItem"
-                        class="bg-green-700 hover:bg-green-600 text-white rounded-lg px-4 py-2 text-lg">Add
+                        class="bg-[#386c39] hover:bg-[#606c38] text-white rounded-lg px-4 py-2 text-lg">Add
                         Item</button>
                     <button v-if="clipboard.length" @click="confirmAction('', true)"
-                        class="bg-red-600 hover:bg-red-500 text-white rounded-lg px-4 text-lg py-2">Clear
+                        class="bg-[#bd3f3c] hover:bg-[#bd693c] text-white rounded-lg px-4 text-lg py-2">Clear
                         Clipboard</button>
                 </div>
             </div>
@@ -62,7 +67,7 @@
                 <textarea v-model="description" placeholder="Description"
                     class="border border-gray-300 rounded-lg p-2 mb-2 w-full h-32 resize-none"></textarea>
                 <button :disabled="description.length === 0 || title.length === 0" @click="saveItem"
-                    class="bg-blue-500 disabled:opacity-60 text-white rounded-lg px-4 py-2">Save</button>
+                    class="bg-blue-700 disabled:opacity-60 text-white rounded-lg px-4 py-2">Save</button>
                 <button @click="closePopup" class="bg-gray-300 text-gray-800 rounded-lg px-4 py-2">Cancel</button>
             </div>
         </div>
@@ -168,6 +173,6 @@ useSeoMeta({
 <style>
 body {
     font-family: Seravek, 'Gill Sans Nova', Ubuntu, Calibri, 'DejaVu Sans', source-sans-pro, sans-serif;
-    font-weight: normal;
+    @apply font-normal bg-[#fefae0];
 }
 </style>
