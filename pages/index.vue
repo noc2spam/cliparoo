@@ -16,7 +16,7 @@
                 </div>
                 <h2 class="text-xl font-bold">My Snippets</h2>
                 <ul v-if="clipboard.length" class="py-4 flex flex-col gap-4">
-                    <li class="grid grid-cols-8 border border-gray-400/60 bg-gray-200 rounded-lg p-2"
+                    <li class="flex items-start justify-between border border-gray-400/60 bg-gray-200 rounded-lg p-2"
                         v-for="(pair, key) in clipboard" :key="key">
                         <div class="col-span-6">
                             <h2 class="text-lg font-medium">{{ pair.title }}</h2>
