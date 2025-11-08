@@ -10,6 +10,21 @@
                 the
                 web.</p>
             <div class="w-full p-4 bg-[#dda15e] shadow-xl rounded-lg overflow-hidden relative">
+                <div class="absolute top-4 right-4 flex gap-2">
+                    <div>
+                        <input ref="importInput" type="file" accept=".json" @change="importClipboard" class="hidden">
+                        <button @click="triggerImport"
+                            class="bg-[#40228a] hover:bg-[#40228a95] text-white rounded-lg px-3 py-1 text-sm transition-colors">
+                            Import
+                        </button>
+                    </div>
+                    <div>
+                        <button @click="exportClipboard" :disabled="!clipboard.length"
+                            class="bg-[#8a3022] hover:bg-[#8a302295] disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg px-3 py-1 text-sm transition-colors">
+                            Export
+                        </button>
+                    </div>
+                </div>
                 <div v-if="appState.textCopied"
                     class="fixed z-20 bg-[#5edd6b] py-2 px-2 text-white top-0 text-center font-medium w-full left-0">
                     Text copied
@@ -94,6 +109,7 @@ const clipboard = ref<{ title: string, description: string }[]>([]);
 const description = ref('');
 const title = ref('');
 const timeout = ref<number | null>(null);
+const importInput = ref<HTMLInputElement | null>(null);
 function addClipboardItem() {
     appState.value = { ...appState.value, popupOpen: true };
 }
@@ -135,6 +151,46 @@ function copyToClipboard(value: string) {
         }, 2000);
     });
 }
+function exportClipboard() {
+    if (!clipboard.value.length) return;
+
+    const dataStr = JSON.stringify(clipboard.value, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(dataBlob);
+    link.download = `cs-export-${Date.now()}.json`;
+    link.click();
+
+    // Clean up the URL object
+    URL.revokeObjectURL(link.href);
+}
+function importClipboard(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const result = e.target?.result as string;
+            const importedData = JSON.parse(result);
+
+            if (Array.isArray(importedData)) {
+                clipboard.value = importedData;
+                localStorage.setItem('clipboard', JSON.stringify(importedData));
+            } else {
+                alert('Invalid file format. Please select a valid JSON file.');
+            }
+        } catch (error) {
+            alert('Error reading file. Please make sure it\'s a valid JSON file.');
+        }
+    };
+    reader.readAsText(file);
+
+    // Clear the input value so the same file can be imported again
+    input.value = '';
+}
 function removeItem(key: string, clearAll = false) {
     if (clearAll) {
         clearClipboard();
@@ -158,6 +214,9 @@ function saveItem() {
     clipboard.value = currentClipboard;
     localStorage.setItem('clipboard', JSON.stringify(currentClipboard));
     closePopup();
+}
+function triggerImport() {
+    importInput.value?.click();
 }
 onMounted(() => {
     const rawClipboard = localStorage.getItem('clipboard');
