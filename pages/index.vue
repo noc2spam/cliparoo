@@ -32,9 +32,20 @@
                     clipboard!
                 </div>
                 <h2 class="text-xl font-medium text-white">My Snippets</h2>
-                <ul v-if="appState.snippets.length" class="py-4 flex flex-col gap-4">
+                <div v-if="appState.snippets.length" class="flex justify-between items-center py-2 mb-2">
+                    <span class="text-white/70 text-sm">{{ appState.snippets.length }} snippet{{
+                        appState.snippets.length === 1 ? '' : 's' }}</span>
+                    <select v-model="appState.sortBy"
+                        class="bg-white/20 text-white rounded px-2 py-1 text-sm border border-white/30">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="title-asc">Title A-Z</option>
+                        <option value="title-desc">Title Z-A</option>
+                    </select>
+                </div>
+                <ul v-if="sortedSnippets.length" class="py-4 flex flex-col gap-4">
                     <li class="flex  flex-col md:flex-row items-start justify-between border border-gray-400/60 bg-[#fefae0] rounded-lg p-2"
-                        v-for="(pair, key) in appState.snippets" :key="key">
+                        v-for="(pair, key) in sortedSnippets" :key="pair.id">
                         <div class="col-span-6">
                             <h2 class="text-lg font-medium">{{ pair.title }}</h2>
                             <div v-for="(line, index) in pair.description.split('\n')" :key="index">{{ line }}</div>
@@ -48,19 +59,19 @@
                                 </button>
                                 <button title="Edit this item"
                                     class="bg-[#5eb5dd95] hover:bg-[#5eb5dd] text-white p-2 rounded-full "
-                                    @click="appState.form.title = pair.title; appState.form.description = pair.description; appState.popupOpen = true">
+                                    @click="appState.form.id = pair.id; appState.form.title = pair.title; appState.form.description = pair.description; appState.popupOpen = true">
                                     <IconsEdit class="h-6 w-6 md:h-8 md:w-8" />
                                 </button>
                                 <button title="Delete this item"
                                     class="bg-[#dd5e5e95] hover:bg-[#dd5e5e] text-white p-2 rounded-full "
-                                    @click="confirmAction(pair.title as string)">
+                                    @click="confirmAction(pair.id as string)">
                                     <IconsDelete class="h-6 w-6 md:h-8 md:w-8" />
                                 </button>
                             </div>
                         </div>
                     </li>
                 </ul>
-                <div v-else class="py-2">
+                <div v-if="!sortedSnippets.length" class="py-2">
                     You currently have no snippets saved.
                 </div>
                 <div class="flex  flex-col md:flex-row gap-2 items-center justify-between">
@@ -96,22 +107,44 @@
     </ClientOnly>
 </template>
 <script setup lang="ts">
+type Snippet = {
+    id: string;
+    title: string;
+    description: string;
+    createdAt: number;
+}
+
+type LegacySnippet = {
+    title: string;
+    description: string;
+    createdAt?: number;
+}
+
+type SnippetInput = {
+    id?: string;
+} & LegacySnippet;
+
+type SortOption = 'newest' | 'oldest' | 'title-asc' | 'title-desc';
+
 const appState = useState<{
     popupOpen: boolean;
     textCopied: boolean;
     confirmOpen: boolean;
     confirmResult: { key?: string | null, confirmed: boolean | undefined, clearAll?: boolean };
     form: {
+        id?: string;
         title: string;
         description: string;
     },
-    snippets: { title: string, description: string }[];
+    snippets: Snippet[];
+    sortBy: SortOption;
 }>('appState', () => ({
     popupOpen: false,
     textCopied: false,
     confirmOpen: false,
     confirmResult: { key: null, confirmed: false },
     snippets: [],
+    sortBy: 'newest' as SortOption,
     form: {
         title: '',
         description: ''
@@ -119,6 +152,9 @@ const appState = useState<{
 }));
 const timeout = ref<number | null>(null);
 const importInput = ref<HTMLInputElement | null>(null);
+function generateId(): string {
+    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+}
 function clearSnippets() {
     localStorage.removeItem('snippets');
     appState.value = { ...appState.value, snippets: [] };
@@ -139,11 +175,11 @@ function commitAction(confirmed: boolean) {
         removeItem(appState.value.confirmResult.key as string);
     }
 }
-function confirmAction(key: string, clearAll = false) {
+function confirmAction(id: string, clearAll = false) {
     appState.value = {
         ...appState.value,
         confirmOpen: true, confirmResult: {
-            key, confirmed: undefined,
+            key: id, confirmed: undefined,
             clearAll
         }
     };
@@ -177,12 +213,22 @@ function importSnippets(event: Event) {
     reader.onload = (e) => {
         try {
             const result = e.target?.result as string;
-            const importedData = JSON.parse(result);
-            if (Array.isArray(importedData)) {
-                appState.value = { ...appState.value, snippets: importedData };
-                localStorage.setItem('snippets', JSON.stringify(importedData));
+            const importedData: unknown = JSON.parse(result);
+            if (Array.isArray(importedData) && importedData.every(isValidSnippetInput)) {
+                const migratedData: Snippet[] = importedData.map((snippet: SnippetInput) => {
+                    if (!snippet.id) {
+                        return {
+                            ...snippet,
+                            id: generateId(),
+                            createdAt: snippet.createdAt || Date.now()
+                        };
+                    }
+                    return snippet as Snippet;
+                });
+                appState.value = { ...appState.value, snippets: migratedData };
+                localStorage.setItem('snippets', JSON.stringify(migratedData));
             } else {
-                alert('Invalid file format. Please select a valid JSON file.');
+                alert('Invalid file format. Please select a valid JSON file with snippet data.');
             }
         } catch (error) {
             alert('Error reading file. Please make sure it\'s a valid JSON file.');
@@ -191,33 +237,49 @@ function importSnippets(event: Event) {
     reader.readAsText(file);
     input.value = '';
 }
+function isValidSnippetInput(obj: unknown): obj is SnippetInput {
+    return (
+        typeof obj === 'object' &&
+        obj !== null &&
+        typeof (obj as SnippetInput).title === 'string' &&
+        typeof (obj as SnippetInput).description === 'string' &&
+        (typeof (obj as SnippetInput).createdAt === 'number' || typeof (obj as SnippetInput).createdAt === 'undefined') &&
+        (typeof (obj as SnippetInput).id === 'string' || typeof (obj as SnippetInput).id === 'undefined')
+    );
+}
 function openPopup() {
     appState.value = { ...appState.value, popupOpen: true };
 }
-function removeItem(key: string, clearAll = false) {
+function removeItem(id: string, clearAll = false) {
     if (clearAll) {
         clearSnippets();
         return;
     }
-    const currentSnippets = appState.value.snippets.filter((item) => item.title !== key);
+    const currentSnippets = appState.value.snippets.filter((item) => item.id !== id);
     appState.value = { ...appState.value, snippets: currentSnippets };
     localStorage.setItem('snippets', JSON.stringify(currentSnippets));
 }
 function saveItem() {
-    const currentItem = appState.value.snippets.findIndex((item) => item.title === appState.value.form.title);
-    if (currentItem !== -1 && appState.value.snippets[currentItem]) {
-        appState.value.snippets[currentItem].description = appState.value.form.description;
-        appState.value = { ...appState.value, snippets: appState.value.snippets };
-        localStorage.setItem('snippets', JSON.stringify(appState.value.snippets));
-        closePopup();
-        return;
+    if (appState.value.form.id) {
+        const currentItem = appState.value.snippets.findIndex((item) => item.id === appState.value.form.id);
+        if (currentItem !== -1 && appState.value.snippets[currentItem]) {
+            appState.value.snippets[currentItem].title = appState.value.form.title;
+            appState.value.snippets[currentItem].description = appState.value.form.description;
+            appState.value = { ...appState.value, snippets: appState.value.snippets };
+            localStorage.setItem('snippets', JSON.stringify(appState.value.snippets));
+            closePopup();
+            return;
+        }
     }
+    const newSnippet = {
+        id: generateId(),
+        title: appState.value.form.title,
+        description: appState.value.form.description,
+        createdAt: Date.now()
+    };
     appState.value = {
         ...appState.value,
-        snippets: [
-            ...appState.value.snippets,
-            { title: appState.value.form.title, description: appState.value.form.description }
-        ]
+        snippets: [...appState.value.snippets, newSnippet]
     };
     localStorage.setItem('snippets', JSON.stringify(appState.value.snippets));
     closePopup();
@@ -225,10 +287,55 @@ function saveItem() {
 function triggerImport() {
     importInput.value?.click();
 }
+const sortedSnippets = computed((): Snippet[] => {
+    const snippets = [...appState.value.snippets];
+    switch (appState.value.sortBy) {
+        case 'newest':
+            return snippets.sort((a, b) => b.createdAt - a.createdAt);
+        case 'oldest':
+            return snippets.sort((a, b) => a.createdAt - b.createdAt);
+        case 'title-asc':
+            return snippets.sort((a, b) => a.title.localeCompare(b.title));
+        case 'title-desc':
+            return snippets.sort((a, b) => b.title.localeCompare(a.title));
+        default:
+            return snippets;
+    }
+});
 onMounted(() => {
     const rawSnippets = localStorage.getItem('snippets');
     if (rawSnippets) {
-        Object.assign(appState.value.snippets, JSON.parse(rawSnippets));
+        try {
+            const parsedSnippets: unknown = JSON.parse(rawSnippets);
+            if (Array.isArray(parsedSnippets) && parsedSnippets.every(isValidSnippetInput)) {
+                // Handle migration from old format without IDs
+                const migratedSnippets: Snippet[] = parsedSnippets.map((snippet: SnippetInput) => {
+                    if (!snippet.id) {
+                        return {
+                            ...snippet,
+                            id: generateId(),
+                            createdAt: snippet.createdAt || Date.now()
+                        };
+                    }
+                    return snippet as Snippet;
+                });
+                appState.value.snippets = migratedSnippets;
+
+                // Save migrated data back to localStorage if migration occurred
+                const needsMigration = migratedSnippets.some((migrated: Snippet) =>
+                    !parsedSnippets.find((original: SnippetInput) => original.id === migrated.id)
+                );
+                if (needsMigration) {
+                    localStorage.setItem('snippets', JSON.stringify(migratedSnippets));
+                }
+            } else {
+                console.warn('Invalid snippet data in localStorage, clearing storage');
+                localStorage.removeItem('snippets');
+            }
+        } catch (error) {
+            console.error('Failed to parse snippets from localStorage:', error);
+            localStorage.removeItem('snippets');
+        }
     }
 })
 useSeoMeta({
