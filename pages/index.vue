@@ -205,7 +205,6 @@ function removeItem(key: string, clearAll = false) {
 }
 function saveItem() {
     const currentItem = appState.value.snippets.findIndex((item) => item.title === appState.value.form.title);
-    console.log(currentItem, appState.value.snippets[currentItem]);
     if (currentItem !== -1 && appState.value.snippets[currentItem]) {
         appState.value.snippets[currentItem].description = appState.value.form.description;
         appState.value = { ...appState.value, snippets: appState.value.snippets };
