@@ -113,9 +113,7 @@
                 <input v-model="appState.form.title" placeholder="Title"
                     class="border border-gray-300 rounded-lg p-2 mb-2 w-full" />
                 <textarea v-model="appState.form.description" placeholder="Description"
-                    class="border border-gray-300 rounded-lg p-2 mb-2 w-full h-32 resize-none"></textarea>
-
-                <!-- Password Protection Options -->
+                    class="border border-gray-300 rounded-lg p-2 mb-2 w-full h-32 resize-none"></textarea>s
                 <div class="flex items-center gap-2 mb-2">
                     <input v-model="appState.form.isProtected" type="checkbox" id="isProtected" class="rounded" />
                     <label for="isProtected" class="text-sm text-gray-700">🔐 Password protect this snippet</label>
