@@ -308,7 +308,6 @@ onMounted(() => {
         try {
             const parsedSnippets: unknown = JSON.parse(rawSnippets);
             if (Array.isArray(parsedSnippets) && parsedSnippets.every(isValidSnippetInput)) {
-                // Handle migration from old format without IDs
                 const migratedSnippets: Snippet[] = parsedSnippets.map((snippet: SnippetInput) => {
                     if (!snippet.id) {
                         return {
@@ -320,8 +319,6 @@ onMounted(() => {
                     return snippet as Snippet;
                 });
                 appState.value.snippets = migratedSnippets;
-
-                // Save migrated data back to localStorage if migration occurred
                 const needsMigration = migratedSnippets.some((migrated: Snippet) =>
                     !parsedSnippets.find((original: SnippetInput) => original.id === migrated.id)
                 );
