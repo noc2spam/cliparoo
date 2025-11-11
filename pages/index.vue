@@ -109,11 +109,11 @@
         <div v-if="appState.popupOpen"
             class="fixed bg-white border border-gray-400 max-w-[800px] w-[90vw] rounded-lg p-4 left-1/2 transform -translate-x-1/2 top-1/2 -translate-y-1/2 shadow-lg ">
             <div class="flex flex-col gap-2 w-full h-full">
-                <h2 class="font-medium text-lg mb-4">{{ appState.form.title.length ? 'Edit Item' : 'Add Item' }}</h2>
+                <h2 class="font-medium text-lg mb-4">{{ appState.form.id?.length ? 'Edit Item' : 'Add Item' }}</h2>
                 <input v-model="appState.form.title" placeholder="Title"
                     class="border border-gray-300 rounded-lg p-2 mb-2 w-full" />
                 <textarea v-model="appState.form.description" placeholder="Description"
-                    class="border border-gray-300 rounded-lg p-2 mb-2 w-full h-32 resize-none"></textarea>s
+                    class="border border-gray-300 rounded-lg p-2 mb-2 w-full h-32 resize-none"></textarea>
                 <div class="flex items-center gap-2 mb-2">
                     <input v-model="appState.form.isProtected" type="checkbox" id="isProtected" class="rounded" />
                     <label for="isProtected" class="text-sm text-gray-700">🔐 Password protect this snippet</label>
