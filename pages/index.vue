@@ -632,6 +632,7 @@ useSeoMeta({
 <style>
 body {
     font-family: Seravek, 'Gill Sans Nova', Ubuntu, Calibri, 'DejaVu Sans', source-sans-pro, sans-serif;
-    @apply font-normal bg-[#fefae0];
+    font-weight: 400;
+    background-color: #fefae0;
 }
 </style>
